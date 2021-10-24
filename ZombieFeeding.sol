@@ -1,8 +1,9 @@
 pragma solidity >=0.5.0 <0.6.0;
-
 import "./ZombieFactory.sol";
 
-// Use function from public CryptoKitty contract -- Zombies love eating kitties
+/**
+* @dev Use function from public CryptoKitty contract -- Zombies love eating kitties
+*/
 contract KittyInterface {
   function getKitty(uint256 _id) external view returns (
     bool isGestating,
@@ -19,15 +20,23 @@ contract KittyInterface {
 }
 
 /**
-  Ability for Zombies to eat other Zombies, and Kitties
- */
-contract ZombieFactory is ZombieFactory {
+* @title ZombieFeeding
+* @dev Ability for Zombies to eat other Zombies, and Kitties
+*/
+contract ZombieFeeding is ZombieFactory {
 
   // Access to kitty contract
-  address ckAddress = 0x06012c8cf97BEaD5deAe237070F9587f8E7A266d;
-  KittyInterface kittyContract = KittyInterface(ckAddress);
+  KittyInterface kittyContract;
+  function setKittyContractAddress(address _address) external {
+    kittyContract = KittyInterface(_address);
+  }
 
-  // When a zombie feeds on some other lifeform, its DNA will combine with the other lifeform's DNA to create a new zombie.
+  /**
+  * @dev When a zombie feeds on some other lifeform, its DNA will combine with the other lifeform's DNA to create a new zombie.
+  * @param _zombieId ID of the Zombie
+  * @param _targetDna DNA of the target lifeform
+  * @param _species The type of lifeform of the target being consumed by the Zombie
+  */
   function feedAndMultiply(uint _zombieId, uint _targetDna, string memory _species) public {
     require(msg.sender == zombieToOwner[_zombieId]);
     Zombie storage myZombie = zombies[_zombieId];
@@ -38,7 +47,12 @@ contract ZombieFactory is ZombieFactory {
     }
     _createZombie("NoName", newDna);
   }
-  // Get kitty DNA based on kitty ID and feed on it
+
+  /**
+  * @dev Feed on a Kitty, retrieve dna based on _kittyID
+  * @param _zombieId ID of the Zombie
+  * @param _kittyId ID of the Kitty
+  */
   function feedOnKitty(uint _zombieId, uint _kittyId) public {
       uint kittyDna;
       (,,,,,,,,,kittyDna) = kittyContract.getKitty(_kittyId);

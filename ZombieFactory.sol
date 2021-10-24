@@ -1,18 +1,22 @@
 pragma solidity >=0.5.0 <0.6.0;
+import "./Ownable.sol";
 
 /**
-  Creates Zombies
-  Zombies have a 16-digit DNA number which determines their appearance. 
-    1st pair of digits determines hat type
-    2nd pair - eye type
-    3rd pair - shirt type
-    4th pair - skin color
-    5th - eye color 
-    6th - clothes color
- */
-contract ZombieFactory {
+* @title ZombieFactory
+* @dev Creates Zombies
+* Zombies have a 16-digit DNA number which determines their appearance. 
+*   1st pair of digits determines hat type
+*   2nd pair - eye type
+*   3rd pair - shirt type
+*   4th pair - skin color
+*   5th - eye color 
+*   6th - clothes color
+*/
+contract ZombieFactory is Ownable{
 
-  // Event that will be emited when a new zombie is created, which can be captured by our frontend app
+  /**
+  * @dev Event that will be emited when a new zombie is created, which can be captured by our frontend app
+  */
   event NewZombie(uint zombieId, string name, uint dna);
 
   uint dnaDigits = 16;
@@ -30,7 +34,11 @@ contract ZombieFactory {
   mapping (uint => address) public zombieToOwner;
   mapping (address => uint) ownerZombieCount;
 
-  // Creates zombies, _name is passed by value
+  /**
+  * @dev Creates zombies, marks their owner. Emits the NewZombie event.
+  * @param _name Name of the Zombie
+  * @param _dna DNA of the Zombie
+  */
   function _createZombie(string memory _name, uint _dna) internal {
     uint id = zombies.push(Zombie(_name, _dna)) - 1;
     // Update mappings
@@ -40,13 +48,20 @@ contract ZombieFactory {
     emit NewZombie(id, _name, _dna);
   } 
 
-  // Creates a 16-bit pseudo-random dna based on an input string
+  /**
+  * @dev Creates a 16-bit pseudo-random dna based on an input string
+  * @param _str User-inputed string
+  * @return 16-bit pseudo-random uint, which will be used as dna
+  */
   function _generateRandomDna(string memory _str) private view returns (uint) {
     uint rand = uint(keccak256(abi.encodePacked(_str)));
     return rand % dnaModulus;
   }
 
-  // Public function which creates a random Zombie based on a given name
+  /**
+  * @dev Creates a random Zombie based on a given input _name.
+  * @param _name Name of the Zombie. Used to create the DNA.
+  */
   function createRandomZombie(string memory _name) public {
     // Only allow players to create one zombie
     require(ownerZombieCount[msg.sender] == 0);
