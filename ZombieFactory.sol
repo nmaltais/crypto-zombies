@@ -1,7 +1,7 @@
 pragma solidity >=0.5.0 <0.6.0;
 
 /**
-  Creaes Zombies
+  Creates Zombies
   Zombies have a 16-digit DNA number which determines their appearance. 
     1st pair of digits determines hat type
     2nd pair - eye type
@@ -26,9 +26,16 @@ contract ZombieFactory {
   // Public dynamic array of Zombie structs
   Zombie[] public zombies;
 
+  // Keep track of which zombie belongs to which user, and how many zombies a user has
+  mapping (uint => address) public zombieToOwner;
+  mapping (address => uint) ownerZombieCount;
+
   // Creates zombies, _name is passed by value
-  function _createZombie(string memory _name, uint _dna) private {
+  function _createZombie(string memory _name, uint _dna) internal {
     uint id = zombies.push(Zombie(_name, _dna)) - 1;
+    // Update mappings
+    zombieToOwner[id] = msg.sender;
+    ownerZombieCount[msg.sender]++;
     // Emit event
     emit NewZombie(id, _name, _dna);
   } 
@@ -41,6 +48,8 @@ contract ZombieFactory {
 
   // Public function which creates a random Zombie based on a given name
   function createRandomZombie(string memory _name) public {
+    // Only allow players to create one zombie
+    require(ownerZombieCount[msg.sender] == 0);
     uint randDna = _generateRandomDna(_name);
     _createZombie(_name, randDna);
   }
