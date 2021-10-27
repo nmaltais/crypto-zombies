@@ -32,20 +32,40 @@ contract ZombieFeeding is ZombieFactory {
   }
 
   /**
+  * @dev Sets cooldown for a Zombie, called after a zombie feeds
+  * @param _zombie Zombie from storage
+  */
+  function _triggerCooldown(Zombie storage _zombie) internal {
+    _zombie.readyTime = uint32(now + cooldownTime);
+  }
+
+  /**
+  * @dev Checks whether Zombie can eat again
+  * @param _zombie Zombie from storage
+  * @return bool - If ready time <= now
+  */
+  function _isReady(Zombie storage _zombie) internal view returns (bool) {
+    return (_zombie.readyTime <= now);
+  }
+
+
+  /**
   * @dev When a zombie feeds on some other lifeform, its DNA will combine with the other lifeform's DNA to create a new zombie.
   * @param _zombieId ID of the Zombie
   * @param _targetDna DNA of the target lifeform
   * @param _species The type of lifeform of the target being consumed by the Zombie
   */
-  function feedAndMultiply(uint _zombieId, uint _targetDna, string memory _species) public {
+  function feedAndMultiply(uint _zombieId, uint _targetDna, string memory _species) internal {
     require(msg.sender == zombieToOwner[_zombieId]);
     Zombie storage myZombie = zombies[_zombieId];
+    require(_isReady(myZombie));
     _targetDna = _targetDna % dnaModulus;
     uint newDna = (myZombie.dna + _targetDna) / 2;
     if(keccak256(abi.encodePacked(_species)) == keccak256(abi.encodePacked("kitty"))){
         newDna = newDna - newDna % 100 + 99;
     }
     _createZombie("NoName", newDna);
+    _triggerCooldown(myZombie);
   }
 
   /**
