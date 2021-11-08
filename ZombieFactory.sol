@@ -28,6 +28,8 @@ contract ZombieFactory is Ownable{
     uint dna;
     uint32 level;
     uint32 readyTime;
+    uint16 winCount;
+    uint16 lossCount;
   }
 
   // Public dynamic array of Zombie structs
@@ -43,7 +45,7 @@ contract ZombieFactory is Ownable{
   * @param _dna DNA of the Zombie
   */
   function _createZombie(string memory _name, uint _dna) internal {
-    uint id = zombies.push(Zombie(_name, _dna, 1, uint32(now + cooldownTime))) - 1;
+    uint id = zombies.push(Zombie(_name, _dna, 1, uint32(now + cooldownTime), 0, 0)) - 1;
     // Update mappings
     zombieToOwner[id] = msg.sender;
     ownerZombieCount[msg.sender]++;

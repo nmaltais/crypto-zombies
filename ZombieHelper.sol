@@ -8,6 +8,8 @@ import "./zombiefeeding.sol";
 */
 contract ZombieHelper is ZombieFeeding {
 
+  uint levelUpFee = 0.001 ether;
+
   /**
     @dev Modifier to ensure a zombie is at or above a certain level
     @param _level uint
@@ -19,19 +21,42 @@ contract ZombieHelper is ZombieFeeding {
     _;
   }
 
+
+  /**
+    @dev Contract owner can withdraw fees
+  */
+  function withdraw() external onlyOwner {
+    address payable _owner = address(uint160(owner()));
+    _owner.transfer(address(this).balance);
+  }
+
+  /**
+    @dev Contract owner can adjust levelUp fee
+  */
+  function setLevelUpFee(uint _fee) external onlyOwner {
+    levelUpFee = _fee;
+  }
+
+
+  /**
+    @dev Levels up Zombie +1 for a fee
+  */
+  function levelUp(uint _zombieId) external payable {
+    require(msg.value == levelUpFee);
+    zombies[_zombieId].level++;
+  }
+
   /**
     @dev Changes name of zombie, if owned by caller
   */
-  function changeName(uint _zombieId, string calldata _newName) external aboveLevel(2, _zombieId) {
-    require(msg.sender == zombieToOwner[_zombieId]);
+  function changeName(uint _zombieId, string calldata _newName) external aboveLevel(2, _zombieId) ownerOf(_zombieId) {
     zombies[_zombieId].name = _newName;
   }
 
   /**
     @dev Changes DNA of zombie, if owned by caller
   */
-  function changeDna(uint _zombieId, uint _newDna) external aboveLevel(20, _zombieId) {
-    require(msg.sender == zombieToOwner[_zombieId]);
+  function changeDna(uint _zombieId, uint _newDna) external aboveLevel(20, _zombieId) ownerOf(_zombieId) {
     zombies[_zombieId].dna = _newDna;
   }
 
@@ -52,6 +77,8 @@ contract ZombieHelper is ZombieFeeding {
     }
     return result;
   }
+
+
 
 
 }
