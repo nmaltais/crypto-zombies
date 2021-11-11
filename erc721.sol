@@ -1,5 +1,6 @@
 pragma solidity >=0.5.0 <0.6.0;
 
+/// @dev OpenZeppelin's implementation of the ERC721 spec draft
 contract ERC721 {
   event Transfer(address indexed _from, address indexed _to, uint256 indexed _tokenId);
   event Approval(address indexed _owner, address indexed _approved, uint256 indexed _tokenId);

@@ -1,9 +1,7 @@
 pragma solidity >=0.5.0 <0.6.0;
 import "./ZombieFactory.sol";
 
-/**
-* @dev Use function from public CryptoKitty contract -- Zombies love eating kitties
-*/
+/// @notice Use function from public CryptoKitty contract -- Zombies love eating kitties
 contract KittyInterface {
   function getKitty(uint256 _id) external view returns (
     bool isGestating,
@@ -19,10 +17,9 @@ contract KittyInterface {
   );
 }
 
-/**
-* @title ZombieFeeding
-* @dev Ability for Zombies to eat other Zombies, and Kitties
-*/
+/// @title ZombieFeeding
+/// @author Nicolas Maltais
+/// @notice Ability for Zombies to eat other Zombies, and Kitties
 contract ZombieFeeding is ZombieFactory {
 
   modifier onlyOwnerOf(uint _zombieId) {
@@ -36,30 +33,24 @@ contract ZombieFeeding is ZombieFactory {
     kittyContract = KittyInterface(_address);
   }
 
-  /**
-  * @dev Sets cooldown for a Zombie, called after a zombie feeds
-  * @param _zombie Zombie from storage
-  */
+  /// @notice Sets cooldown for a Zombie, called after a zombie feeds
+  /// @param _zombie Zombie from storage
   function _triggerCooldown(Zombie storage _zombie) internal {
     _zombie.readyTime = uint32(now + cooldownTime);
   }
 
-  /**
-  * @dev Checks whether Zombie can eat again
-  * @param _zombie Zombie from storage
-  * @return bool - If ready time <= now
-  */
+  /// @notice Checks whether Zombie can eat again
+  /// @param _zombie Zombie from storage
+  /// @return bool - If ready time <= now
   function _isReady(Zombie storage _zombie) internal view returns (bool) {
     return (_zombie.readyTime <= now);
   }
 
 
-  /**
-  * @dev When a zombie feeds on some other lifeform, its DNA will combine with the other lifeform's DNA to create a new zombie.
-  * @param _zombieId ID of the Zombie
-  * @param _targetDna DNA of the target lifeform
-  * @param _species The type of lifeform of the target being consumed by the Zombie
-  */
+  /// @notice When a zombie feeds on some other lifeform, its DNA will combine with the other lifeform's DNA to create a new zombie.
+  /// @param _zombieId ID of the Zombie
+  /// @param _targetDna DNA of the target lifeform
+  /// @param _species The type of lifeform of the target being consumed by the Zombie
   function feedAndMultiply(uint _zombieId, uint _targetDna, string memory _species) internal onlyOwnerOf(_zombieId) {
     Zombie storage myZombie = zombies[_zombieId];
     require(_isReady(myZombie));
@@ -72,11 +63,9 @@ contract ZombieFeeding is ZombieFactory {
     _triggerCooldown(myZombie);
   }
 
-  /**
-  * @dev Feed on a Kitty, retrieve dna based on _kittyID
-  * @param _zombieId ID of the Zombie
-  * @param _kittyId ID of the Kitty
-  */
+  /// @notice Feed on a Kitty, retrieve dna based on _kittyID
+  /// @param _zombieId ID of the Zombie
+  /// @param _kittyId ID of the Kitty
   function feedOnKitty(uint _zombieId, uint _kittyId) public {
       uint kittyDna;
       (,,,,,,,,,kittyDna) = kittyContract.getKitty(_kittyId);
