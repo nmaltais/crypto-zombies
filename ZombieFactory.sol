@@ -1,5 +1,6 @@
 pragma solidity >=0.5.0 <0.6.0;
 import "./Ownable.sol";
+import "./safemath.sol";
 
 /**
 * @title ZombieFactory
@@ -13,6 +14,10 @@ import "./Ownable.sol";
 *   6th - clothes color
 */
 contract ZombieFactory is Ownable{
+
+  using SafeMath for uint256;
+  using SafeMath32 for uint32;
+  using SafeMath16 for uint16;
 
   /**
   * @dev Event that will be emited when a new zombie is created, which can be captured by our frontend app
@@ -48,7 +53,7 @@ contract ZombieFactory is Ownable{
     uint id = zombies.push(Zombie(_name, _dna, 1, uint32(now + cooldownTime), 0, 0)) - 1;
     // Update mappings
     zombieToOwner[id] = msg.sender;
-    ownerZombieCount[msg.sender]++;
+    ownerZombieCount[msg.sender] = ownerZombieCount[msg.sender].add(1);
     // Emit event
     emit NewZombie(id, _name, _dna);
   } 
