@@ -49,14 +49,14 @@ contract ZombieHelper is ZombieFeeding {
   /**
     @dev Changes name of zombie, if owned by caller
   */
-  function changeName(uint _zombieId, string calldata _newName) external aboveLevel(2, _zombieId) ownerOf(_zombieId) {
+  function changeName(uint _zombieId, string calldata _newName) external aboveLevel(2, _zombieId) onlyOwnerOf(_zombieId) {
     zombies[_zombieId].name = _newName;
   }
 
   /**
     @dev Changes DNA of zombie, if owned by caller
   */
-  function changeDna(uint _zombieId, uint _newDna) external aboveLevel(20, _zombieId) ownerOf(_zombieId) {
+  function changeDna(uint _zombieId, uint _newDna) external aboveLevel(20, _zombieId) onlyOwnerOf(_zombieId) {
     zombies[_zombieId].dna = _newDna;
   }
 
